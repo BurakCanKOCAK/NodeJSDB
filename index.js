@@ -9,11 +9,32 @@ var db = new sqlite3.Database('mydb.db');
 //Others
 const bodyParsser=require('body-parser');
 
+
 //-----------------------------------------------------------//
 var check;
 db.serialize(function() {
   db.run("CREATE TABLE if not exists user (ROWID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,flatId INT, info TEXT)");
-  var ROWID=null;
+  db.each("SELECT flatId, info FROM user", function(err, row) {
+      console.log(row.flatId + " : " + row.info);
+  });
+});
+
+//------------------------------------------------------------------------------/
+//------------------------------------------------------------------------------/
+app.get('/index',function(req,res){
+    res.send();
+})
+//------------------------------------------------------------------------------/
+app.get('/',function(req,res){
+    res.send('Hello!');
+})
+//------------------------------------------------------------------------------/
+app.get('/home/:version',(req,res)=>{
+    res.send('HOME! &s',req.params.version);
+})
+//------------------------------------------------------------------------------/
+app.get('/db/put',(req,res)=>{
+    var ROWID=null;
   var stmt = db.prepare("INSERT INTO user VALUES ("+ROWID+",?,?)");
   for (var i = 0; i < 10; i++) {
       var d = new Date();
@@ -21,21 +42,10 @@ db.serialize(function() {
       stmt.run(n,"User"+i);
   }
   stmt.finalize();
+  res.sendStatus(200); 
 
-  db.each("SELECT flatId, info FROM user", function(err, row) {
-      console.log(row.flatId + " : " + row.info);
-  });
-});
-
-//--------------------------------------------------------//
-app.get('/',function(req,res){
-    res.send('HELLO!');
 })
-
-app.get('/home/:version',(req,res)=>{
-    res.send('HOME! &s',req.params.version);
-})
-
+//------------------------------------------------------------------------------/
 app.get('/db',function(req,res){
     //REACH DB AND GET DATA
     var textF="";
@@ -53,12 +63,13 @@ app.get('/db',function(req,res){
 
     res.send(textF); 
 })
-
+//------------------------------------------------------------------------------/
 app.get('/list',(req,res)=>{
     res.sendFile(__dirname+'/static/index.html')
 })
 
-//--------------------------------------------------------//
+//------------------------------------------------------------------------------/
+//------------------------------------------------------------------------------/
 var server = app.listen(8081,"127.0.0.1", function (res,req) {
     var host = server.address().address
     var port = server.address().port
