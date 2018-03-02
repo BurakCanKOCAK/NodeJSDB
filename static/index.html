@@ -3,8 +3,69 @@
 <head>
   <meta charset="UTF-8">
   <title>NodeJS App</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 </head>
 <body>
-  Test
+    <!--BUTTON  !-->
+    <div class="container">
+    <a href="#!" class="btn btn-primary" id="button">EXAMPLE</a>
+    <div class="dd" id="text">
+
+    <!--INPUT TEXT !-->
+    </div>
+    <input type="text" id="input_holder"/>
+    </div>
+
+    <!--JQUERY  !-->
+    <script
+    src="https://code.jquery.com/jquery-3.3.1.min.js"
+    integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+    crossorigin="anonymous"></script>
+
+    <!--SOCKET.IO !-->    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
+
+
+<!--AJAX + JS SCRIPT !-->
+<script>
+  var socket = io('http://127.0.0.1:8081');
+  var server_address = "http://127.0.0.1:8081"
+  
+  //When data arrives on socket.io
+  socket.on('data', function (data) {
+    console.log("DATA FROM SOCKET");
+    console.log(data);
+    $("#text").append(data);
+  });
+
+  //When hmtl file loaded
+  $(document).ready(function(){
+    $("#button").click(function(){
+      var input_val = $("#input_holder").val();
+      
+      //Send data to nodejs using socket.io
+      socket.emit('btn_click',{data:input_val});
+      
+      /*
+      //Send data to nodejs using ajax
+      $.ajax({
+        url:server_address+"/db",
+        type:"GET",
+        contentType:"application/json",
+      })
+      .done(function(data){
+        console.log("SUCCESS");
+        $("#text").text(JSON.stringify(data));
+      })
+      .fail(function(data){
+        console.log("ERROR");
+        console.log(data);
+      })
+      */
+     
+    })
+  });
+</script>
+
 </body>
 </html>

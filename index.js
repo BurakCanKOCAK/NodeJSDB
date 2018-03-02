@@ -2,13 +2,17 @@
 //express
 var express = require('express');
 var app = express();
+var server = require('http').Server(app);
+var io = require('socket.io')(server);
 //db
 var sqlite3 = require('sqlite3').verbose();
 var db = new sqlite3.Database('mydb.db');
+var cors = require('cors');
+
+app.use(cors());
 
 //Others
 const bodyParsser=require('body-parser');
-
 
 //-----------------------------------------------------------//
 var check;
@@ -26,7 +30,7 @@ app.get('/index',function(req,res){
 })
 //------------------------------------------------------------------------------/
 app.get('/',function(req,res){
-    res.send('Hello!');
+    res.sendFile(__dirname+'/static/index.html')
 })
 //------------------------------------------------------------------------------/
 app.get('/home/:version',(req,res)=>{
@@ -53,15 +57,18 @@ app.get('/db',function(req,res){
         db.each("SELECT rowid,flatId, info FROM user", function(err, row) { 
             if (err) 
             {
-                res.send('Error in DB transaction!');
+                //res.send('Error in DB transaction!');
                 console.log(err)
             } 
-            console.log("User id : "+row.rowid+" - "+row.flatId+" - "+row.info);  
+            else
+            {
+                //res.status(200).send("User id : "+row.rowid+" - "+row.flatId+" - "+row.info);
+                //console.log("User id : "+row.rowid+" - "+row.flatId+" - "+row.info);
+            }
+              
          }); 
-    });
-     //DB CLOSE
-
-    res.send(textF); 
+    }); 
+    res.status(200).send({one:"one",two:"two"});
 })
 //------------------------------------------------------------------------------/
 app.get('/list',(req,res)=>{
@@ -70,13 +77,15 @@ app.get('/list',(req,res)=>{
 
 //------------------------------------------------------------------------------/
 //------------------------------------------------------------------------------/
-var server = app.listen(8081,"127.0.0.1", function (res,req) {
+/*var server = app.listen(8081,"127.0.0.1", function (res,req) {
     var host = server.address().address
     var port = server.address().port
     
     console.log("Server listening at http://%s:%s", host, port)
  })
- 
+ */
+
+ server.listen(8081);
 
  function closeDb() {
     db.close((err) => {
@@ -86,3 +95,25 @@ var server = app.listen(8081,"127.0.0.1", function (res,req) {
         console.log('Database connection closed!');
     });
 }
+
+//io Socket Connection Between Interface and NodeJS
+io.on('connection',function(socket){
+
+    console.log("connect success");
+    
+    //Send data each second
+    setInterval(function(){
+        socket.emit('data',"oneoneone");
+        console.log("ONE SEND");
+    },1000)
+
+    //Receive data when button clicked
+    socket.on("btn_click",function(data){
+        console.log("NODE DATA");
+        console.log(data);
+    })
+
+
+
+
+})
