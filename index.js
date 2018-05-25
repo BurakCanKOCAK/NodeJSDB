@@ -33,6 +33,10 @@ app.get('/',function(req,res){
     res.sendFile(__dirname+'/static/index.html')
 })
 //------------------------------------------------------------------------------/
+app.get('/login',function(req,res){
+    res.sendFile(__dirname+'/static/login.html')
+})
+//------------------------------------------------------------------------------/
 app.get('/home/:version',(req,res)=>{
     res.send('HOME! &s',req.params.version);
 })
